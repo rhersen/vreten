@@ -1,0 +1,5 @@
+<tr class="bad">
+    <td> <%= fromExpectedDateTime %> <%= fromDestination %></td>
+    <td> <%= toExpectedDateTime %> <%= toDestination %></td>
+    <td><%= diff %></td>
+</tr>

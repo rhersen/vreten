@@ -7,6 +7,6 @@
 </head>
 <body>
 <script type="text/javascript" src="<%= js %>"></script>
-<script type="text/javascript">window.addEventListener('DOMContentLoaded', hello);</script>
+<script type="text/javascript">window.addEventListener('DOMContentLoaded', init);</script>
 </body>
 </html>

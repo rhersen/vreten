@@ -1,0 +1,3 @@
+<tr>
+    <td> <%= ExpectedDateTime %> <%= Destination %></td>
+</tr>

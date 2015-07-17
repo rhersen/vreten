@@ -1,4 +1,0 @@
-<div>
-  <%= ExpectedDateTime %>
-  <%= Destination %>
-</div>

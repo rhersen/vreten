@@ -391,6 +391,68 @@ describe("json", function () {
     it("diff", function () {
         var from = southeast(json)[0];
         var to = findConnecting(from, southwest(json));
-        expect(diff(to, from)).toEqual(4)
+        expect(diff(to, from)).toEqual(240)
+    });
+
+    it("diff with seconds", function () {
+        var from = {ExpectedDateTime: '2015-07-09T08:18:00'};
+        var to = {ExpectedDateTime: '2015-07-09T08:20:49'};
+        expect(diff(to, from)).toBe(169)
+    });
+
+    it("diff across hours", function () {
+        var from = {ExpectedDateTime: '2015-07-09T07:49:00'};
+        var to = {ExpectedDateTime: '2015-07-09T08:04:07'};
+        expect(diff(to, from)).toBe(907)
+    });
+
+    function nows(lines) {
+        return new RegExp(lines.join('\\s*'));
+    }
+
+    it("no matching", function () {
+        var train = {
+            ExpectedDateTime: '2015-07-09T07:49:00',
+            Destination: 'Tumba'
+        };
+        expect(showTrain(train, []))
+            .toMatch(nows(['<tr>',
+                '<td>', '2015-07-09T07:49:00', 'Tumba', '</td>',
+                '</tr>']))
+    });
+
+    it("matching", function () {
+        var train = {
+            ExpectedDateTime: '2015-07-10T17:50:00',
+            Destination: 'Stockholm'
+        };
+        var match = {
+            ExpectedDateTime: '2015-07-10T17:54:00',
+            Destination: 'Södertälje'
+        };
+        expect(showTrain(train, [match]))
+            .toMatch(nows([
+                '<tr>',
+                '<td>', '2015-07-10T17:50:00 Stockholm', '</td>',
+                '<td>', '2015-07-10T17:54:00 Södertälje', '</td>',
+                '<td>', '240', '</td>',
+                '</tr>']))
+    });
+
+    it("bad connection", function () {
+        var train = {
+            ExpectedDateTime: '2015-07-10T17:50:00',
+            Destination: 'Stockholm'
+        };
+        var match = {
+            ExpectedDateTime: '2015-07-10T18:02:00',
+            Destination: 'Södertälje'
+        };
+        expect(showTrain(train, [match])).toMatch(nows([
+            '<tr class="bad">',
+            '<td>', '2015-07-10T17:50:00 Stockholm', '</td>',
+            '<td>', '2015-07-10T18:02:00 Södertälje', '</td>',
+            '<td>', '720', '</td>',
+            '</tr>']))
     });
 });

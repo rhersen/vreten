@@ -510,23 +510,48 @@ window.findConnecting = function (train, southwest) {
 };
 
 window.diff = function (train1, train2) {
-    var regExp = /..:(..):../;
-    return regExp.exec(train1.ExpectedDateTime)[1] - regExp.exec(train2.ExpectedDateTime)[1];
+    var regExp = /(..):(..):(..)/;
+    var m1 = regExp.exec(train1.ExpectedDateTime);
+    var m2 = regExp.exec(train2.ExpectedDateTime);
+    var min = m1[2] - m2[2];
+    var sec = m1[3] - m2[3];
+    var hour = m1[1] !== m2[1];
+    return 3600 * hour + 60 * min + sec;
 };
 
-window.hello = function () {
+window.showTrain = function (train, sw) {
+    var no = JST['app/templates/no-connection.us'];
+    var good = JST['app/templates/good-connection.us'];
+    var bad = JST['app/templates/bad-connection.us'];
+    var matching = findConnecting(train, sw);
+    if (matching) {
+        var seconds = diff(matching, train);
+        return (seconds < 500 ? good : bad)({
+            fromExpectedDateTime: train.ExpectedDateTime,
+            fromDestination: train.Destination,
+            toExpectedDateTime: matching.ExpectedDateTime,
+            toDestination: matching.Destination,
+            diff: seconds
+        });
+    } else {
+        return no(train);
+    }
+};
+
+window.init = function () {
     function showTrains(json) {
         var sw = southwest(json);
-        var jst = JST['app/templates/hello.us'];
+        var s = '<table>';
+        s += '<tr>';
+        s += '<th>Till Karlberg</th>';
+        s += '<th>Från Karlberg</th>';
+        s += '<th>Byte (sekunder)</th>';
+        s += '</tr>';
         _.forEach(southeast(json), function (train) {
-            document.body.innerHTML += jst(train);
-            var matching = findConnecting(train, sw);
-            if (matching) {
-                document.body.innerHTML += jst(matching);
-                document.body.innerHTML += diff(matching, train);
-                document.body.innerHTML += '<hr />';
-            }
+            s += showTrain(train, sw);
         });
+        s += '</table>';
+        document.body.innerHTML += s;
     }
 
     var request = new XMLHttpRequest();
