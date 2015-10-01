@@ -417,7 +417,7 @@ describe("json", function () {
         };
         expect(showTrain(train, []))
             .toMatch(nows(['<tr>',
-                '<td>', '2015-07-09T07:49:00', 'Tumba', '</td>',
+                '<td>', '07:49:00', 'Tumba', '</td>',
                 '</tr>']))
     });
 
