@@ -492,7 +492,9 @@ window.southwest = function (json) {
     var westbound = _.filter(southbound, function (train) {
         return _.contains(["36", "38"], train.LineNumber);
     });
-    return _.reject(westbound, {Destination: 'Älvsjö'});
+    return _.reject(westbound, function (train) {
+        return _.contains(['Älvsjö', 'Stockholm C'], train.Destination);
+    });
 };
 
 window.southeast = function (json) {
@@ -519,22 +521,37 @@ window.diff = function (train1, train2) {
     return 3600 * hour + 60 * min + sec;
 };
 
+window.expectedTime = function (train) {
+    var s = train.ExpectedDateTime;
+    var match = /(.+)T(.+)/.exec(s);
+    if (match) {
+        return match[2];
+    } else {
+        return s;
+    }
+};
+
+
 window.showTrain = function (train, sw) {
     var no = JST['app/templates/no-connection.us'];
     var good = JST['app/templates/good-connection.us'];
     var bad = JST['app/templates/bad-connection.us'];
     var matching = findConnecting(train, sw);
+
     if (matching) {
         var seconds = diff(matching, train);
         return (seconds < 500 ? good : bad)({
-            fromExpectedDateTime: train.ExpectedDateTime,
+            fromExpectedDateTime: expectedTime(train),
             fromDestination: train.Destination,
-            toExpectedDateTime: matching.ExpectedDateTime,
+            toExpectedDateTime: expectedTime(matching),
             toDestination: matching.Destination,
             diff: seconds
         });
     } else {
-        return no(train);
+        return no({
+            expectedTime: expectedTime(train),
+            destination: train.Destination
+        });
     }
 };
 

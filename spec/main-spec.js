@@ -433,8 +433,8 @@ describe("json", function () {
         expect(showTrain(train, [match]))
             .toMatch(nows([
                 '<tr>',
-                '<td>', '2015-07-10T17:50:00 Stockholm', '</td>',
-                '<td>', '2015-07-10T17:54:00 Södertälje', '</td>',
+                '<td>', '17:50:00 Stockholm', '</td>',
+                '<td>', '17:54:00 Södertälje', '</td>',
                 '<td>', '240', '</td>',
                 '</tr>']))
     });
@@ -450,9 +450,17 @@ describe("json", function () {
         };
         expect(showTrain(train, [match])).toMatch(nows([
             '<tr class="bad">',
-            '<td>', '2015-07-10T17:50:00 Stockholm', '</td>',
-            '<td>', '2015-07-10T18:02:00 Södertälje', '</td>',
+            '<td>', '17:50:00 Stockholm', '</td>',
+            '<td>', '18:02:00 Södertälje', '</td>',
             '<td>', '720', '</td>',
             '</tr>']))
+    });
+
+    it("expectedTime removes date", function () {
+        var train = {
+            ExpectedDateTime: '2015-07-10T17:50:00',
+            Destination: 'Stockholm'
+        };
+        expect(expectedTime(train)).toBe('17:50:00');
     });
 });
